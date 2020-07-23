@@ -2,9 +2,13 @@
 require('./config/config');
 
 const express = require('express');
+const bodyParser = require('body-parser');
+
+// Using Node.js `require()`
+const mongoose = require('mongoose');
+
 const app = express();
 
-const bodyParser = require('body-parser');
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -12,43 +16,15 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // parse application/json
 app.use(bodyParser.json());
 
-app.get('/usuario', function (req, res) {
-  res.json('Get Usuario');
-});
- 
-app.post('/usuario', function (req, res) {
+app.use( require('./routes/usuario') );
 
-    let body = req.body;
-
-    if ( !body.nombre ) {
-
-        res.status(400).json({
-            ok: false,
-            mensaje: 'El nombre es necesario'
-        });
-
-    } else {
-
-        res.json({
-            persona: body
-        });
-
-    }
-
-});
-
-app.put('/usuario/:id', function (req, res) {
-
-    let id = req.params.id;
-
-    res.json({
-        id
-    });
-});
-
-app.delete('/usuario', function (req, res) {
-    res.json('Delete Usuario');
-});
+mongoose.connect(process.env.URLDB, {
+  useNewUrlParser: true,
+  useCreateIndex: true,
+  useUnifiedTopology: true
+})
+    .then(resp => console.log('Mongoose Conectado'))
+    .catch(err => console.log('Error en conectar a Mongoose', err));
 
 app.listen(process.env.PORT, () => {
     console.log('Escuchando el puerto', 3000);
